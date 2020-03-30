@@ -1,10 +1,12 @@
 asgiref==3.2.7
+dj-database-url==0.5.0
 Django==3.0.4
 django-debug-toolbar==2.2
 django-geojson==3.0.0
 django-leaflet==0.26.0
 jsonfield==3.1.0
 mysqlclient==1.4.6
+python-decouple==3.3
 pytz==2019.3
 six==1.14.0
 sqlparse==0.3.1
