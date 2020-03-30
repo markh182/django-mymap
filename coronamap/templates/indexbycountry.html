@@ -62,7 +62,7 @@
                 var props = feature.properties;
                 icon = L.divIcon({
                   className: 'custom-div-icon',
-                  {% if country == "Germany" %}
+                  {% if country == "Germany" or country == "germany" %}
                   html: `<div class='marker-pin' data-tooltip="${props.province}\nInsgesamt bestätigt: ${props.confirmed}\nTodesfälle: ${props.deaths}\nDiff. zum Vortag: ${props.difference}"><div class='circle circle2'></div></div>`,
                   {% else %}
                   html: `<div class='marker-pin' data-tooltip="${props.province}\nConfirmed: ${props.confirmed}\nDeaths: ${props.deaths}\nDiff. to previous day: ${props.difference}"><div class='circle circle2'></div></div>`,
@@ -91,7 +91,7 @@
         <div class="heading box">
           <span class="heading-box-span"><label for="theme-switch" title="Toggle Dark & Light mode." class="switch-label"></label></span>
           <p class="header">Coronavirus 2019 (COVID-19) -
-            {% if country == "Germany" %}
+            {% if country == "Germany" or country == "germany" %}
             Fallzahlen in Deutschland
             {% else %}
             Case numbers in {{ country }}
@@ -99,7 +99,7 @@
 
             {% for data in confirmed|slice:":1" %}
             <span class="header-span">
-              {% if country == "Germany" %}
+              {% if country == "Germany" or country == "germany" %}
               (Stand vom: {{ data.date }})
               {% else %}
               (Last updated: {{ data.date }})
@@ -121,7 +121,7 @@
         <div class="confirmed box box-height">
           <div class="center">
             <p class="box-label">
-              {% if country == "Germany" %}
+              {% if country == "Germany" or country == "germany"  %}
               Insgesamt bestätigt
               {% else %}
               Total Confirmed
@@ -142,7 +142,7 @@
             {% else %}
             <div>
               <span>
-                {% if country == "Germany" %}
+                {% if country == "Germany" or country == "germany" %}
                 Keine Daten vorhanden.
                 {% else %}
                 No data available.
@@ -158,7 +158,7 @@
         <div class="deaths box box-height">
           <div class="center">
             <p class="box-label">
-              {% if country == "Germany" %}
+              {% if country == "Germany" or country == "germany" %}
               Todesfälle
               {% else %}
               Total Deaths
@@ -179,7 +179,7 @@
             {% else %}
             <div>
               <span>
-                {% if country == "Germany" %}
+                {% if country == "Germany" or country == "germany" %}
                 Keine Daten vorhanden.
                 {% else %}
                 No data available.
@@ -192,7 +192,7 @@
         <div class="difference box box-height">
           <div class="center">
             <p class="box-label">
-              {% if country == "Germany" %}
+              {% if country == "Germany" or country == "germany" %}
               Dif­fe­renz zum Vor­tag
               {% else %}
               Difference to previous day
@@ -213,7 +213,7 @@
             {% else %}
             <div>
               <span>
-                {% if country == "Germany" %}
+                {% if country == "Germany" or country == "germany" %}
                 Keine Daten vorhanden.
                 {% else %}
                 No data available.
