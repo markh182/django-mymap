@@ -1,0 +1,149 @@
+{% load leaflet_tags %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %} COVID-19 {% endblock %}</title>
+
+    {{ form.media }}
+    {% leaflet_js %}
+    {% leaflet_css %}
+
+    <link rel="stylesheet" href="{% static "css/covid-grid.css" %}">
+
+    <script type="text/javascript">
+      var dataurl = '{% url "coronamap:data" %}';
+
+      window.addEventListener("map:init", function (event) {
+        var map = event.detail.map;
+
+        // Download GeoJSON data with Ajax
+        fetch(dataurl)
+          .then(function(resp) {
+            return resp.json();
+          })
+          .then(function(data) {
+            L.geoJson(data, {
+              pointToLayer: function (feature, latlng) {
+                var props = feature.properties;
+                icon = L.divIcon({
+                  className: 'custom-div-icon',
+                  html: `<div class='marker-pin2' data-tooltip="${props.combinedKey}\nConfirmed: ${props.confirmed}\nDeaths: ${props.deaths}\nRecovered: ${props.recovered}"><div class='circle circle2'></div></div>`,
+                  // html : `<div class="circle circle1" data-tooltip="${props.province}\nInsgesamt bestätigt: ${props.confirmed}\nTodesfälle: ${props.deaths}\nDiff. zum Vortag: ${props.difference}"><div class="circle circle2"></div></div>`,
+                  iconSize: [30, 42],
+                  iconAnchor: [15, 42]
+                });
+                return L.marker(latlng, {icon: icon});
+              },
+              onEachFeature: function onEachFeature(feature, layer) {
+                var props = feature.properties;
+                var content = `<p><strong>${props.combinedKey}</strong><br/>Confirmed: ${props.confirmed}<br/>Deaths: ${props.deaths}<br/>Recovered: ${props.recovered}<br/>Active cases: ${props.active}</p>`;
+                layer.bindPopup(content);
+            }}).addTo(map);
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <input type="checkbox" class="theme-switch" id="theme-switch">
+    <div id="page">
+      <div class="wrapper">
+        <div class="heading box">
+          <span class="heading-box-span"><label for="theme-switch" title="Toggle Dark & Light mode." class="switch-label"></label></span>
+          <p class="header">
+            Coronavirus 2019 (COVID-19) - Cases by Country
+            {% for data in confirmed|slice:":1" %}
+            <span class="header-span">(Last updated: {{ data.date }})</span>
+            {% endfor %}
+          </p>
+        </div>
+        <div class="legal box">
+          <p>
+            Data sources: <a href="https://coronadatascraper.com">coronadatascraper.com</a>,
+            <a href="https://github.com/Veritas83/">Github - Veritas83</a> and
+            <a href="https://github.com/CSSEGISandData/COVID-19">Github - CSSEGISandData</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="wrapper2">
+        <div class="confirmed box box-height">
+          <div class="center">
+            <p class="box-label">Total Confirmed</p>
+            <p class="box-label-number confirmed-color">{{ confirmed_number.confirmed__sum|intcomma }}</p>
+          </div>
+          <div>
+            {% if confirmed %}
+            <div class="box-list-height">
+            {% for con in confirmed %}
+            <a href="{% url 'coronamap:country' con.country %}">
+              <div class="box-list-item">
+                <span class="box-list-item-number confirmed-color">{{ con.confirmed|intcomma }}</span>
+                <span>{{ con.combinedKey }}</span>
+              </div>
+            </a>
+            {% endfor %}
+            </div>
+            {% else %}
+            <div>
+              <span>No data available.</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="map map-box">
+          {% leaflet_map "main" %}
+        </div>
+        <div class="deaths box box-height">
+          <div class="center">
+            <p class="box-label">Total Deaths</p>
+            <p class="box-label-number deaths-color">{{ deaths_number.deaths__sum|intcomma }}</p>
+          </div>
+          <div>
+            {% if deaths %}
+            <div class="box-list-height">
+            {% for death in deaths %}
+              <div class="box-list-item">
+                <span class="box-list-item-number deaths-color">{{ death.deaths|intcomma }}</span>
+                <span>{{ death.combinedKey }}</span>
+              </div>
+            {% endfor %}
+            </div>
+            {% else %}
+            <div>
+              <span>No data available</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="recovered box box-height">
+          <div class="center">
+            <p class="box-label">Total Recovered</p>
+            <p class="box-label-number recovered-color">{{ recovered_number.recovered__sum|intcomma }}</p>
+          </div>
+          <div>
+            {% if recovered %}
+            <div class="box-list-height">
+            {% for recover in recovered %}
+              <div class="box-list-item">
+                <span class="box-list-item-number recovered-color">{{ recover.recovered|intcomma }}</span>
+                <span>{{ recover.combinedKey }}</span>
+              </div>
+            {% endfor %}
+            </div>
+            {% else %}
+            <div>
+              <span>No data available</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>
+{% endblock %}
