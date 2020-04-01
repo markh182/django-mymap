@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{% static "css/covid-grid.css" %}">
 
     <script type="text/javascript">
-      var dataurl = '{% url "coronamap:databycountry" country %}';
+      var dataurl = '{% url "coronamap:databyprovince" country province %}';
 
       window.addEventListener("map:init", function (event) {
         var map = event.detail.map;
@@ -29,7 +29,7 @@
         {% for center in centralCountry %}
           {{ center.long }}
         {% endfor %}
-        ], 5)
+        ], 7)
 
 
         // icon = L.divIcon({
@@ -86,15 +86,15 @@
   </head>
   <body>
     <input type="checkbox" class="theme-switch" id="theme-switch">
-    <div id="page">
+    <div id="page" class="province">
       <div class="wrapper">
         <div class="heading box">
           <span class="heading-box-span"><label for="theme-switch" title="Toggle Dark & Light mode." class="switch-label"></label></span>
           <p class="header">Coronavirus 2019 (COVID-19) -
             {% if country == "Germany" or country == "germany" %}
-            Fallzahlen in Deutschland
+            Fallzahlen für {{ province }}
             {% else %}
-            Case numbers in {{ country }}
+            Case numbers in the local area {{ province }}
             {% endif %}
 
             {% for data in confirmed|slice:":1" %}
@@ -106,13 +106,6 @@
               {% endif %}
             </span>
             {% endfor %}
-          </p>
-        </div>
-        <div class="legal box">
-          <p>
-            Data sources: <a href="https://coronadatascraper.com">coronadatascraper.com</a>,
-            <a href="https://github.com/Veritas83/">Github - Veritas83</a> and
-            <a href="https://github.com/CSSEGISandData/COVID-19">Github - CSSEGISandData</a>
           </p>
         </div>
       </div>
@@ -129,33 +122,6 @@
             </p>
             <p class="box-label-number confirmed-color">{{ confirmed_number.confirmed__sum|intcomma }}</p>
           </div>
-          <div>
-            {% if confirmed %}
-            <div class="box-list-height">
-            {% for con in confirmed %}
-            <a href="{% url 'coronamap:province' con.country con.province %}">
-              <div class="box-list-item">
-                <span class="box-list-item-number confirmed-color">{{ con.confirmed|intcomma }}</span>
-                <span>{{ con.province }}</span>
-              </div>
-            </a>
-            {% endfor %}
-            </div>
-            {% else %}
-            <div>
-              <span>
-                {% if country == "Germany" or country == "germany" %}
-                Keine Daten vorhanden.
-                {% else %}
-                No data available.
-                {% endif %}
-              </span>
-            </div>
-            {% endif %}
-          </div>
-        </div>
-        <div class="map map-box">
-          {% leaflet_map "main" %}
         </div>
         <div class="deaths box box-height">
           <div class="center">
@@ -167,28 +133,6 @@
               {% endif %}
             </p>
             <p class="box-label-number deaths-color">{{ deaths_number.deaths__sum|intcomma }}</p>
-          </div>
-          <div>
-            {% if deaths %}
-            <div class="box-list-height">
-            {% for death in deaths %}
-              <div class="box-list-item">
-                <span class="box-list-item-number deaths-color">{{ death.deaths|intcomma }}</span>
-                <span>{{ death.province }}</span>
-              </div>
-            {% endfor %}
-            </div>
-            {% else %}
-            <div>
-              <span>
-                {% if country == "Germany" or country == "germany" %}
-                Keine Daten vorhanden.
-                {% else %}
-                No data available.
-                {% endif %}
-              </span>
-            </div>
-            {% endif %}
           </div>
         </div>
         <div class="difference box box-height">
@@ -202,28 +146,16 @@
             </p>
             <p class="box-label-number diff-color">{{ diff_number.difference__sum|intcomma }}</p>
           </div>
-          <div>
-            {% if diff %}
-            <div class="box-list-height">
-            {% for dif in diff %}
-              <div class="box-list-item">
-                <span class="box-list-item-number diff-color">{{ dif.difference|intcomma }}</span>
-                <span>{{ dif.province }}</span>
-              </div>
-            {% endfor %}
-            </div>
-            {% else %}
-            <div>
-              <span>
-                {% if country == "Germany" or country == "germany" %}
-                Keine Daten vorhanden.
-                {% else %}
-                No data available.
-                {% endif %}
-              </span>
-            </div>
-            {% endif %}
-          </div>
+        </div>
+        <div class="legal box">
+          <p>
+            Data sources: <a href="https://coronadatascraper.com">coronadatascraper.com</a>,
+            <a href="https://github.com/Veritas83/">Github - Veritas83</a> and
+            <a href="https://github.com/CSSEGISandData/COVID-19">Github - CSSEGISandData</a>
+          </p>
+        </div>
+        <div class="map map-box">
+          {% leaflet_map "main" %}
         </div>
       </div>
     </div>
