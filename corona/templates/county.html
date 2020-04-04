@@ -1,0 +1,128 @@
+{% load leaflet_tags %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<html id="county">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %} COVID-19 {% endblock %}</title>
+    {{ form.media }}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    <link rel="stylesheet" href="{% static "css/corona.css" %}">
+    <script type="text/javascript">
+      var dataurl = '{% url "corona:county_data" country state county %}';
+      window.addEventListener("map:init", function (event) {
+        var map = event.detail.map;
+        map.removeControl(map.zoomControl);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        {% if country == 'Germany' or country == 'germany' %}
+
+        function polystyle(feature) {
+          return {
+            fillColor: '#FFFFFF',
+            weight: 2,
+            opacity: 0.8,
+            color: '#443765',
+            fillOpacity: 0.3
+          };
+        }
+
+        {% with template_name=country|stringformat:'s'|add:'.geojson' %}
+        var geojsonFeatureCountry = {% include 'geojson/country_'|add:template_name %}
+        {% endwith %}
+        var geojson = L.geoJSON(geojsonFeatureCountry, {style: polystyle}).addTo(map);
+
+        var geojsonFeaturePolygon = {{ border.polygon|safe }};
+        var geojson = L.geoJSON(geojsonFeaturePolygon, {style: polystyle}).addTo(map);
+        {% endif %}
+
+        // Fly to Country Center
+        map.flyTo([
+        {% for center in centralCountry %}
+          {{ center.lat }}
+        {% endfor %}
+        ,
+        {% for center in centralCountry %}
+          {{ center.long }}
+        {% endfor %}
+        ], 7)
+
+        // Download GeoJSON data with Ajax
+        fetch(dataurl)
+          .then(function(resp) {
+            return resp.json();
+          })
+          .then(function(data) {
+            L.geoJson(data, {
+              pointToLayer: function (feature, latlng) {
+                var props = feature.properties;
+                icon = L.divIcon({
+                  className: 'custom-div-icon',
+                  html : `<div class="circle circle1" data-tooltip="${props.county}\nConfirmed: ${props.confirmed}\Increase to previous day: ${props.difference}\nDeaths: ${props.deaths}"><div class="circle circle2"><div class="circle circle3"></div></div></div>`,
+                  iconSize: [30, 42],
+                  iconAnchor: [15, 42]
+                });
+                return L.marker(latlng, {icon: icon});
+              },
+              onEachFeature: function onEachFeature(feature, layer) {
+                var props = feature.properties;
+                var content = `<p><strong>${props.county}</strong><br/>Confirmed: ${props.confirmed}<br/>Increase to previous day: ${props.difference}<br/>Deaths: ${props.deaths}</p>`;
+                layer.bindPopup(content);
+            }
+           }).addTo(map);
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="page">
+      <header style="width:100%;">
+        <p class="header center">Coronavirus-Monitor</>
+      </header>
+      <div class="map">
+        {% leaflet_map "main" %}
+      </div>
+      <div class="sidebar">
+        <div class="sidebar-title">
+          <div class="display-title">Coronavirus cases {{ county_name|title }}</div>
+          <div class="display-timestamp">
+            <strong>Last updated:</strong> {{ date.date }}
+          </div>
+        </div>
+        <div class="display-detail">
+          <div class="display-box display-confirmed">
+            <div class="cases-number">{{ confirmed_number.confirmed__sum|intcomma }}</div>
+            <div class="cases-label">Confirmed</div>
+          </div>
+          <div class="display-box display-difference">
+            <div class="cases-number">{{ difference_number.difference__sum|intcomma }}</div>
+            <div class="cases-label">Increase</div>
+          </div>
+          <div class="display-box display-deaths">
+            <div class="cases-number">{{ deaths_number.deaths__sum|intcomma }}</div>
+            <div class="cases-label">Deaths</div>
+          </div>
+        </div>
+        <div class="box-list-title">
+          <span class="country">Cities</span>
+        </div>
+        <div class="box-list-height">
+          <div class="box-list-item">
+            <span class="country">No data available.</span>
+          </div>
+        </div>
+      </div>
+      <div class="legal">
+        <div class="sources">
+          <p>
+            <strong>Sources:</strong> <a href="https://coronadatascraper.com" target="_blank">coronadatascraper.com</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+{% endblock %}

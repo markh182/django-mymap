@@ -1,0 +1,302 @@
+:root {
+  /* Light mode */
+  --light-background-color: #FFFFFF;
+  --light-color: #222222;
+  --light-header-background-color: #EEEEEE;
+  --light-border-color: #CCCCCC;
+  --light-sidebar-background-color: #EEEEEE;
+  --light-confirmed-background-color: rgba(68,55,101,0.3);
+  --light-recovered-background-color: rgba(249,122,45,0.3);
+  --light-difference-background-color: rgba(249,122,45,0.3);
+  --light-deaths-background-color: rgba(48,36,45,0.1);
+  --light-confirmed-color: #443765;
+  --light-recovered-color: #F97A2d;
+  --light-difference-color: #F97A2d;
+  --light-deaths-color: #30242D;
+  --light-boxlist-title-border-bottom: #606060;
+
+  /* Dark mode */
+  --dark-background-color: #000000;
+  --dark-color: #BDBDBD;
+  --dark-header-background-color: #EEEEEE;
+  --dark-border-color: #363636;
+  --dark-sidebar-background-color: #222222;
+  --dark-confirmed-background-color: rgba(68,55,101,0.3);
+  --dark-recovered-background-color: rgba(249,122,45,0.3);
+  --dark-difference-background-color: rgba(249,122,45,0.3);
+  --dark-deaths-background-color: rgba(48,36,45,0.1);
+  --dark-confirmed-color: #443765;
+  --dark-recovered-color: #F97A2d;
+  --dark-difference-color: #F97A2d;
+  --dark-deaths-color: #30242D;
+  --dark-boxlist-title-border-bottom: #606060;
+
+
+  /* Light mode */
+  --light-switch-shadow: #373d4e;
+  --light-switch-icon: "🌚";
+  --light-switch-text: "Dark mode!";
+
+  /* Dark mode */
+  --dark-switch-shadow: #fce477;
+  --dark-switch-icon: "🌝";
+  --dark-switch-text: "Light mode!";
+
+
+  /* Default mode */
+  --switch-shadow: var(--light-switch-shadow);
+  --switch-icon: var(--light-switch-icon);
+  --switch-text: var(--light-switch-text);
+
+  --background-color: var(--light-background-color);
+  --color: var(--light-color);
+  --header-background-color: var(--light-header-background-color);
+  --border-color: var(--light-border-color);
+  --sidebar-background-color: var(--light-sidebar-background-color);
+  --confirmed-background-color: var(--light-confirmed-background-color);
+  --recovered-background-color: var(--light-recovered-background-color);
+  --difference-background-color: var(--light-difference-background-color);
+  --deaths-background-color: var(--light-deaths-background-color);
+  --confirmed-color: var(--light-confirmed-color);
+  --recovered-color: var(--light-recovered-color);
+  --difference-color: var(--light-difference-color);
+  --deaths-color: var(--light-deaths-color);
+  --boxlist-title-border-bottom: var(--light-boxlist-title-border-bottom);
+}
+
+.theme-switch:checked ~ #page {
+  --switch-shadow: var(--dark-switch-shadow);
+  --switch-icon: var(--dark-switch-icon);
+  --switch-text: var(--dark-switch-text);
+}
+
+html {
+  font-size: 16px;
+  color: var(---color);
+  background-color: var(--background-color);
+  padding: 0;
+  margin: 0;
+}
+body {
+  font-family: 'Roboto Condensed', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin: 0;
+}
+h1,h2,h3,h4,h5,h6 {
+  margin: 0;
+  padding: 0;
+}
+h1 {
+  font-size: 28px;
+  font-weight: 1001;
+}
+a, a:visited, a:hover, a:active {
+  color: var(--color);
+  text-decoration: none;
+}
+p {
+  padding: 0;
+  margin: 0;
+}
+.center {
+  text-align: center;
+}
+.right {
+  float: right;
+}
+p.header {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+.header {
+  position: absolute;
+  top:10px;
+  left:10px;
+  z-index:1000;
+  width: 300px;
+  height: auto;
+  margin: 0;
+  font-weight: 700;
+  padding: 6px;
+  background-color: var(--header-background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+}
+
+.legal {
+  position: absolute;
+  bottom:10px;
+  left:10px;
+  z-index:1000;
+  width: auto;
+  height: auto;
+  margin: 0;
+  font-size: 10px;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--sidebar-background-color);
+  border-radius: 5px;
+}
+.legal.sources p {
+  text-size: 10px;
+}
+.leaflet-container {
+  min-height: 100%;
+  height: 100vh;
+}
+
+.sidebar {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  z-index:1000;
+  width: 350px;
+  height: auto;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--sidebar-background-color);
+  border-radius: 4px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.15);
+}
+.sidebar-title {
+  padding: 5px;
+}
+.display-title {
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 5px;
+}
+.display-timestamp {
+  font-size: 12px;
+}
+.display-detail {
+  display: flex;
+  justify-content: space-between;
+}
+.display-box {
+  text-align: center;
+  padding: 0.5em 0.25em;
+  width: 32.5%;
+  border-radius: 4px;
+  line-height: 1.2;
+  margin: 5px;
+}
+.display-confirmed {
+  background-color: var(--confirmed-background-color);
+  color: var(--confirmed-color);
+}
+.display-recovered {
+  background-color: var(--recovered-background-color);
+  color: var(--recovered-color);
+}
+.display-difference {
+  background-color: var(--difference-background-color);
+  color: var(--difference-color);
+}
+.display-deaths {
+  background-color: var(--deaths-background-color);
+  color: var(--deaths-color);
+}
+.cases-number {
+  font-weight: 700;
+}
+.cases-label {
+  font-size: 0.8rem;
+}
+.box-list-title {
+  padding: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  border-bottom: 1px solid var(--boxlist-title-border-bottom);
+}
+div.box-list-title span.confirmed,
+div.box-list-title span.recovered,
+div.box-list-title span.difference,
+div.box-list-title span.deaths {
+  display: inline-block;
+  text-align: right;
+  font-weight: bold;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: right;
+  width: 60px;
+}
+
+.box-list-height {
+   height: calc(100vh - 222px - 36px);
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+.box-list-item {
+  padding: 5px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+div.box-list-item span.title {
+  display: inline-block;
+  width: 35%;
+}
+div.box-list-item span.confirmed {
+  display: inline-block;
+  font-weight: bold;
+  text-align: right;
+  width: 60px;
+  color: var(--confirmed-color);
+}
+div.box-list-item span.recovered {
+  display: inline-block;
+  font-weight: bold;
+  text-align: right;
+  width: 60px;
+  color: var(--recovered-color);
+}
+div.box-list-item span.difference {
+  display: inline-block;
+  font-weight: bold;
+  text-align: right;
+  width: 60px;
+  color: var(--difference-color);
+}
+div.box-list-item span.deaths {
+  display: inline-block;
+  font-weight: bold;
+  text-align: right;
+  width: 60px;
+  color: var(--deaths-color);
+}
+
+/* Map Marker */
+div.circle {
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+.circle1 {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background-color: var(--confirmed-color);
+  opacity: 0.8;
+  margin: 8px 0 0 -15px;
+}
+
+.circle2 {
+  transform: translate(25%, 25%);
+  width: 20px;
+  height: 20px;
+  background-color: var(--difference-color);
+  margin: -15px 0 0 -15px;
+}
+.circle3 {
+  transform: translate(48%, 46%);
+  width: 10px;
+  height: 10px;
+  background-color: var(--deaths-color);
+  margin: -10px 0 0 -10px;
+}
+/* Map Marker */
