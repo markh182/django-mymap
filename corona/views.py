@@ -189,8 +189,11 @@ class StateMap(TemplateView):
             context['state_name'] = state
 
         if country == 'Germany' or country == 'germany':
-            border = Borders.objects.filter(level='state').filter(country=country).filter(state=state)
-            context['border'] = border[0]
+            if data:
+                borders = Borders.objects.filter(country=country).filter(state=state)
+            else:
+                borders = Borders.objects.filter(level='state').filter(country=country).filter(state=state)
+            context['borders'] = borders
 
         return context
 
@@ -246,21 +249,38 @@ class CountyMap(TemplateView):
         data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)
 
         context = super(CountyMap, self).get_context_data(**kwargs)
-        context['data'] = data
-        context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('confirmed'))
-        context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('deaths'))
-        context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('recovered'))
-        context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('difference'))
-        context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='county').filter(state_slug=state).filter(county_slug=county)[:1]
-        context['country'] = country
-        context['state'] = state
-        context['county'] = county
-        context['date'] = date
 
         if data:
+            context['data'] = data
+            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('confirmed'))
+            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('deaths'))
+            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('recovered'))
+            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('difference'))
+            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='county').filter(state_slug=state).filter(county_slug=county)[:1]
+            context['country'] = country
+            context['state'] = state
+            context['county'] = county
+            context['date'] = date
             context['county_name'] = data[0].county
         else :
+            level = "county"
+            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('confirmed'))
+            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('deaths'))
+            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('recovered'))
+            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('difference'))
+            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='county').filter(state_slug=state).filter(county_slug=county)[:1]
+            context['country'] = country
+            context['state'] = state
+            context['date'] = date
             context['county_name'] = county
+
+        if country == 'Germany' or country == 'germany':
+            if data:
+                borders = Borders.objects.filter(country=country).filter(state=state).filter(county=county)
+            else:
+                borders = Borders.objects.filter(level='county').filter(country=country).filter(state=state)
+            context['borders'] = borders
+
         return context
 
 class CountyMapLayer(GeoJSONLayerView):
@@ -289,5 +309,6 @@ class CountyMapLayer(GeoJSONLayerView):
         country = self.kwargs.get('country')
         state = self.kwargs.get('state')
         county = self.kwargs.get('county')
+
         queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)
         return queryset

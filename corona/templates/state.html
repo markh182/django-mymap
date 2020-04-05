@@ -18,24 +18,36 @@
         map.removeControl(map.zoomControl);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        {% if country == 'Germany' or country == 'germany' %}
-
         function polystyle(feature) {
           return {
             fillColor: '#FFFFFF',
-            weight: 2,
-            opacity: 0.8,
+            fillOpacity: 0,
             color: '#443765',
-            fillOpacity: 0.3
+            weight: 2,
+            opacity: 1
           };
         }
-        {% with template_name=country|stringformat:'s'|add:'.geojson' %}
-        var geojsonFeatureCountry = {% include 'geojson/country_'|add:template_name %}
-        {% endwith %}
-        var geojson = L.geoJSON(geojsonFeatureCountry, {style: polystyle}).addTo(map);
+        function formatNumber(num) {
+          return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+        }
 
-        var geojsonFeaturePolygon = {{ border.polygon|safe }};
-        var geojson = L.geoJSON(geojsonFeaturePolygon, {style: polystyle}).addTo(map);
+        {% if country == 'Germany' or country == 'germany' %}
+
+          {% with template_name=country|stringformat:'s'|add:'.geojson' %}
+          var geojsonFeatureCountry = {% include 'geojson/country_'|add:template_name %}
+          {% endwith %}
+          var geojson = L.geoJSON(geojsonFeatureCountry, {style: polystyle}).addTo(map);
+
+          {% if borders %}
+            {% for border in borders %}
+              var geojsonFeaturePolygon =
+              {{ border.polygon|safe }};
+              var geojson = L.geoJSON(geojsonFeaturePolygon, {style: polystyle}).addTo(map);
+            {% endfor %}
+          {% endif %}
+        {% else %}
+          var geojsonFeatureWorld = {% include 'geojson/world.geoJson' %}
+          var geojson = L.geoJSON(geojsonFeatureWorld, {style: polystyle}).addTo(map);
         {% endif %}
 
         // Fly to Country Center
@@ -47,7 +59,7 @@
         {% for center in centralCountry %}
           {{ center.long }}
         {% endfor %}
-        ], 6)
+      ], 7)
 
         // Download GeoJSON data with Ajax
         fetch(dataurl)
@@ -70,7 +82,19 @@
                 var props = feature.properties;
                 var title = '';
                 if(props.county) { title = props.county; } else { title = props.state; }
-                var content = `<p><strong>${title}</strong><br/>Confirmed: ${props.confirmed}<br/>Increase to previous day: ${props.difference}<br/>Deaths: ${props.deaths}</p>`;
+                var content = `
+                <div class="title"><strong>${title}</strong></div>
+                <div class="display-detail">
+                  <div class="display-box display-confirmed">
+                    <div class="cases-number">${formatNumber(props.confirmed)}</div>
+                  </div>
+                  <div class="display-box display-difference">
+                    <div class="cases-number">${formatNumber(props.difference)}</div>
+                  </div>
+                  <div class="display-box display-deaths">
+                    <div class="cases-number">${formatNumber(props.deaths)}</div>
+                  </div>
+                </div>`;
                 layer.bindPopup(content);
             }
            }).addTo(map);
@@ -80,8 +104,13 @@
   </head>
   <body>
     <div id="page">
-      <header style="width:100%;">
-        <p class="header center">Coronavirus-Monitor</>
+      <header>
+        <a href="{% url "corona:world" %}">
+          <div class="header">
+            <img class="img-header" src="{% static 'img/covid.png' %}" alt="COVID-19">
+              <p class="center">Coronavirus-Monitor</>
+          </div>
+        </a>
       </header>
       <div class="map">
         {% leaflet_map "main" %}
@@ -131,7 +160,7 @@
         </div>
         {% else %}
         <div class="box-list-item">
-          <span class="country">No data available.</span>
+          <span class="nodata">No data available.</span>
         </div>
         {% endif %}
       </div>

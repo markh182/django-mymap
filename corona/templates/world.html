@@ -21,11 +21,14 @@
         function polystyle(feature) {
           return {
             fillColor: '#FFFFFF',
-            weight: 2,
-            opacity: 0.8,
+            fillOpacity: 0,
             color: '#443765',
-            fillOpacity: 0.3
+            weight: 2,
+            opacity: 1
           };
+        }
+        function formatNumber(num) {
+          return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
         }
 
         var geojsonFeatureWorld = {% include 'geojson/world.geoJson' %}
@@ -42,15 +45,28 @@
                 var props = feature.properties;
                 icon = L.divIcon({
                   className: 'custom-div-icon',
-                  html : `<div class="circle circle1" data-tooltip="${props.country_name}\nConfirmed: ${props.confirmed}\Increase to previous day: ${props.difference}\nDeaths: ${props.deaths}"><div class="circle circle2"><div class="circle circle3"></div></div></div>`,
+                  html : `<div class="circle circle1" data-tooltip="&lt;span&gt;${props.country_name}\nConfirmed: ${props.confirmed}\nIncrease to previous day: ${props.difference}\nDeaths: ${props.deaths}"><div class="circle circle2"><div class="circle circle3"></div></div></div>`,
                   iconSize: [30, 42],
                   iconAnchor: [15, 42]
                 });
                 return L.marker(latlng, {icon: icon});
               },
               onEachFeature: function onEachFeature(feature, layer) {
+
                 var props = feature.properties;
-                var content = `<p><strong>${props.country_name}</strong><br/>Confirmed: ${props.confirmed}<br/>Increase to previous day: ${props.difference}<br/>Deaths: ${props.deaths}</p>`;
+                var content = `
+                <div class="title"><strong>${props.country_name}</strong></div>
+                <div class="display-detail">
+                  <div class="display-box display-confirmed">
+                    <div class="cases-number">${formatNumber(props.confirmed)}</div>
+                  </div>
+                  <div class="display-box display-difference">
+                    <div class="cases-number">${formatNumber(props.difference)}</div>
+                  </div>
+                  <div class="display-box display-deaths">
+                    <div class="cases-number">${formatNumber(props.deaths)}</div>
+                  </div>
+                </div>`;
                 layer.bindPopup(content);
             }
            }).addTo(map);
@@ -60,8 +76,13 @@
   </head>
   <body>
     <div id="page">
-      <header style="width:100%;">
-        <p class="header center">Coronavirus-Monitor</>
+      <header>
+        <a href="{% url "corona:world" %}">
+          <div class="header">
+            <img class="img-header" src="{% static 'img/covid.png' %}" alt="COVID-19">
+              <p class="center">Coronavirus-Monitor</>
+          </div>
+        </a>
       </header>
       <div class="map">
         {% leaflet_map "main" %}
@@ -110,7 +131,7 @@
         </div>
         {% else %}
         <div class="box-list-item">
-          <span class="country">No data available.</span>
+          <span class="nodata">No data available.</span>
         </div>
         {% endif %}
       </div>
