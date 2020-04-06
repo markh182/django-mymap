@@ -6,13 +6,15 @@ from django.db.models import Sum
 import datetime
 
 today = datetime.date.today()
-yesterday = today - datetime.timedelta(days = 1)
+# yesterday = today - datetime.timedelta(days = 1)
 
 # Create your views here.
 class WorldMap(TemplateView):
     template_name = "world.html"
 
     def get_context_data(self, **kwargs):
+        level = "country"
+
         try:
             object = Covid19.objects.last()
         except Covid19.DoesNotExist:
@@ -23,9 +25,7 @@ class WorldMap(TemplateView):
         else:
             date = today
 
-        level = "country"
         data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level)
-
         context = super(WorldMap, self).get_context_data(**kwargs)
 
         if data:
@@ -56,6 +56,7 @@ class WorldMapLayer(GeoJSONLayerView):
     use_natural_keys = False # use_natural_keys : serialize natural keys instead of primary keys (default: False)
 
     def get_queryset(self):
+        level = "country"
 
         try:
             object = Covid19.objects.last()
@@ -67,7 +68,6 @@ class WorldMapLayer(GeoJSONLayerView):
         else:
             date = today
 
-        level = "country"
         queryset = Covid19.objects.filter(date=date).filter(level=level)
         return queryset
 
@@ -75,6 +75,9 @@ class CountryMap(TemplateView):
     template_name = "country.html"
 
     def get_context_data(self, **kwargs):
+        level = "state"
+        country = self.kwargs.get('country')
+
         try:
             object = Covid19.objects.last()
         except Covid19.DoesNotExist:
@@ -85,8 +88,6 @@ class CountryMap(TemplateView):
         else:
             date = today
 
-        level = "state"
-        country = self.kwargs.get('country')
         data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country)
 
         context = super(CountryMap, self).get_context_data(**kwargs)
@@ -125,6 +126,8 @@ class CountryMapLayer(GeoJSONLayerView):
     use_natural_keys = False # use_natural_keys : serialize natural keys instead of primary keys (default: False)
 
     def get_queryset(self):
+        level = "state"
+        country = self.kwargs.get('country')
 
         try:
             object = Covid19.objects.last()
@@ -136,8 +139,6 @@ class CountryMapLayer(GeoJSONLayerView):
         else:
             date = today
 
-        level = "state"
-        country = self.kwargs.get('country')
         queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country)
 
         if not queryset:
@@ -149,19 +150,20 @@ class StateMap(TemplateView):
     template_name = "state.html"
 
     def get_context_data(self, **kwargs):
+        level = "county"
+        country = self.kwargs.get('country')
+        state = self.kwargs.get('state')
+
         try:
             object = Covid19.objects.last()
         except Covid19.DoesNotExist:
             object = None
         if object:
-            last_date = Covid19.objects.latest('date')
+            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).latest('date')
             date = last_date.date
         else:
             date = today
 
-        level = "county"
-        country = self.kwargs.get('country')
-        state = self.kwargs.get('state')
         data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state)
         context = super(StateMap, self).get_context_data(**kwargs)
 
@@ -208,20 +210,20 @@ class StateMapLayer(GeoJSONLayerView):
     use_natural_keys = False # use_natural_keys : serialize natural keys instead of primary keys (default: False)
 
     def get_queryset(self):
+        level = "county"
+        country = self.kwargs.get('country')
+        state = self.kwargs.get('state')
 
         try:
             object = Covid19.objects.last()
         except Covid19.DoesNotExist:
             object = None
         if object:
-            last_date = Covid19.objects.latest('date')
+            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).latest('date')
             date = last_date.date
         else:
             date = today
 
-        level = "county"
-        country = self.kwargs.get('country')
-        state = self.kwargs.get('state')
         queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state)
 
         if not queryset:
@@ -232,22 +234,22 @@ class CountyMap(TemplateView):
     template_name = "county.html"
 
     def get_context_data(self, **kwargs):
+        level = "county"
+        country = self.kwargs.get('country')
+        state = self.kwargs.get('state')
+        county = self.kwargs.get('county')
+
         try:
             object = Covid19.objects.last()
         except Covid19.DoesNotExist:
             object = None
         if object:
-            last_date = Covid19.objects.latest('date')
+            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date')
             date = last_date.date
         else:
             date = today
 
-        level = "county"
-        country = self.kwargs.get('country')
-        state = self.kwargs.get('state')
-        county = self.kwargs.get('county')
         data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)
-
         context = super(CountyMap, self).get_context_data(**kwargs)
 
         if data:
@@ -294,21 +296,20 @@ class CountyMapLayer(GeoJSONLayerView):
     use_natural_keys = False # use_natural_keys : serialize natural keys instead of primary keys (default: False)
 
     def get_queryset(self):
+        level = "county"
+        country = self.kwargs.get('country')
+        state = self.kwargs.get('state')
+        county = self.kwargs.get('county')
 
         try:
             object = Covid19.objects.last()
         except Covid19.DoesNotExist:
             object = None
         if object:
-            last_date = Covid19.objects.latest('date')
+            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date')
             date = last_date.date
         else:
             date = today
-
-        level = "county"
-        country = self.kwargs.get('country')
-        state = self.kwargs.get('state')
-        county = self.kwargs.get('county')
 
         queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)
         return queryset
