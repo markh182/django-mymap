@@ -18,8 +18,6 @@
         map.removeControl(map.zoomControl);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        {% if country == 'Germany' or country == 'germany' %}
-
         function polystyle(feature) {
           return {
             fillColor: '#FFFFFF',
@@ -33,17 +31,12 @@
           return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
         }
 
-        {% with template_name=country|stringformat:'s'|add:'.geojson' %}
-        var geojsonFeatureCountry = {% include 'geojson/country_'|add:template_name %}
-        {% endwith %}
-        var geojson = L.geoJSON(geojsonFeatureCountry, {style: polystyle}).addTo(map);
-
-        {% for border in borders %}
-          var geojsonFeaturePolygon =
-          {{ border.polygon|safe }};
-          var geojson = L.geoJSON(geojsonFeaturePolygon, {style: polystyle}).addTo(map);
-        {% endfor %}
-
+        {% if borders %}
+          {% for border in borders %}
+            var geojsonFeaturePolygon =
+            {{ border.polygon|safe }};
+            var geojson = L.geoJSON(geojsonFeaturePolygon, {style: polystyle}).addTo(map);
+          {% endfor %}
         {% endif %}
 
         // Fly to Country Center

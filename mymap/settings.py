@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'leaflet',
     'djgeojson',
-    'coronamap',
+    # 'coronamap',
+    'corona',
 ]
 
 MIDDLEWARE = [
@@ -148,12 +149,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 LEAFLET_CONFIG = {
     # 'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 46),
-    'DEFAULT_CENTER': (52.866079, 9.684325),
-    'DEFAULT_ZOOM': 2,
+    'DEFAULT_CENTER': (51.09924480150008, 10.473758178500105),
+    'DEFAULT_ZOOM': 5,
     'MIN_ZOOM': 0,
     'MAX_ZOOM': 18,
     # 'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
-    # 'SCALE': 'both', # 'metric' or 'imperial' or 'both'
+    'SCALE': False, # 'metric' or 'imperial' or 'both'
     # 'MINIMAP': True,
-    # 'RESET_VIEW': True,
+    'RESET_VIEW': False,
+    'TILES': [('OpenStreetMap', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {'attribution': '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'}),
+              ('Stadia', 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {'attribution': '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>'}),
+              ('Stadia-Dark', 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {'attribution': '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>'}),
+              # ('Stadia-OSM', 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {'attribution': '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>'}),
+              # ('World-Grey', 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}.png', {'attribution': '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ'}),
+              # ('Esri World', 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}.png', {'attribution': '&copy; Esri &mdash; Source: US National Park Service'}),
+              # ('Wikimedia', 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {'attribution': '&copy; <a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>'}),
+              ],
 }

@@ -31,8 +31,13 @@
           return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
         }
 
-        var geojsonFeatureWorld = {% include 'geojson/world.geoJson' %}
-        var geojson = L.geoJSON(geojsonFeatureWorld, {style: polystyle}).addTo(map);
+        {% if borders %}
+          {% for border in borders %}
+            var geojsonFeaturePolygon =
+            {{ border.polygon|safe }};
+            var geojson = L.geoJSON(geojsonFeaturePolygon, {style: polystyle}).addTo(map);
+          {% endfor %}
+        {% endif %}
 
         // Download GeoJSON data with Ajax
         fetch(dataurl)

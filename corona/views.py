@@ -6,7 +6,7 @@ from django.db.models import Sum
 import datetime
 
 today = datetime.date.today()
-# yesterday = today - datetime.timedelta(days = 1)
+yesterday = today - datetime.timedelta(days = 1)
 
 # Create your views here.
 class WorldMap(TemplateView):
@@ -15,25 +15,21 @@ class WorldMap(TemplateView):
     def get_context_data(self, **kwargs):
         level = "country"
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.last()
         if object:
-            last_date = Covid19.objects.latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level)
+        data = Covid19.objects.filter(level=level).filter(date=date)
+
         context = super(WorldMap, self).get_context_data(**kwargs)
-
         if data:
-            context['data'] = data
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).aggregate(Sum('difference'))
+            context['data'] = data.order_by('-confirmed')
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
             context['date'] = data.latest('date')
         else :
             context['data'] = ''
@@ -43,7 +39,11 @@ class WorldMap(TemplateView):
             context['difference_number'] = 0
             context['date'] = date
 
+        borders = Borders.objects.filter(level=level).filter(state='').filter(county='')
+        context['borders'] = borders
+
         return context
+
 
 class WorldMapLayer(GeoJSONLayerView):
     properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'difference') # properties : list of properties names, or dict for mapping field names and properties
@@ -58,18 +58,15 @@ class WorldMapLayer(GeoJSONLayerView):
     def get_queryset(self):
         level = "country"
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.last()
         if object:
-            last_date = Covid19.objects.latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        queryset = Covid19.objects.filter(date=date).filter(level=level)
+        queryset = Covid19.objects.filter(level=level).filter(date=date)
         return queryset
+
 
 class CountryMap(TemplateView):
     template_name = "country.html"
@@ -78,42 +75,46 @@ class CountryMap(TemplateView):
         level = "state"
         country = self.kwargs.get('country')
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.filter(level=level).filter(country_slug=country).last()
         if object:
-            last_date = Covid19.objects.latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).filter(country_slug=country).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country)
+        data = Covid19.objects.filter(level=level).filter(country_slug=country).filter(date=date)
 
         context = super(CountryMap, self).get_context_data(**kwargs)
-
         if data:
-            context['data'] = data
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).aggregate(Sum('difference'))
-            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='country').filter(state='').filter(county='')[:1]
+            context['data'] = data.order_by('-confirmed')
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='country').filter(country_slug=country).filter(state='').filter(county='')[:1]
             context['country'] = country
             context['date'] = date
             context['country_name'] = data[0].country_name
         else :
+            data = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date=date)
             context['data'] = ''
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level='country').filter(country_slug=country).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level='country').filter(country_slug=country).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level='country').filter(country_slug=country).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level='country').filter(country_slug=country).aggregate(Sum('difference'))
-            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='country').filter(state='').filter(county='')[:1]
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['centralCountry'] =  data.filter(state='').filter(county='')[:1]
             context['country'] = country
             context['date'] = date
             context['country_name'] = country
 
+        if country == 'Germany' or country == 'germany':
+            borders = Borders.objects.filter(level=level).filter(country=country).filter(county='')
+            context['borders'] = borders
+        else:
+            borders = Borders.objects.filter(level='country').filter(country=country)
+            context['borders'] = borders
+
         return context
+
 
 class CountryMapLayer(GeoJSONLayerView):
     properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'difference') # properties : list of properties names, or dict for mapping field names and properties
@@ -129,20 +130,15 @@ class CountryMapLayer(GeoJSONLayerView):
         level = "state"
         country = self.kwargs.get('country')
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.filter(level=level).filter(country_slug=country).last()
         if object:
-            last_date = Covid19.objects.latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).filter(country_slug=country).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country)
-
+        queryset = Covid19.objects.filter(level=level).filter(country_slug=country).filter(date=date)
         if not queryset:
-            queryset = Covid19.objects.filter(date=date).filter(level='country').filter(country_slug=country)
+            queryset = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date=date)
         return queryset
 
 
@@ -154,47 +150,43 @@ class StateMap(TemplateView):
         country = self.kwargs.get('country')
         state = self.kwargs.get('state')
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).last()
         if object:
-            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state)
+        data = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(date=date)
+
         context = super(StateMap, self).get_context_data(**kwargs)
-
         if data:
-            context['data'] = data
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('difference'))
-            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='state').filter(state_slug=state).filter(county='')[:1]
+            context['data'] = data.order_by('-confirmed')
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(county='')[:1]
             context['country'] = country
             context['state'] = state
             context['date'] = date
             context['state_name'] = data[0].state
         else :
-            level = "state"
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('difference'))
-            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='state').filter(state_slug=state).filter(county='')[:1]
+            data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date=date)
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['centralCountry'] =  data.filter(county='')[:1]
             context['country'] = country
             context['state'] = state
             context['date'] = date
             context['state_name'] = state
 
         if country == 'Germany' or country == 'germany':
-            if data:
-                borders = Borders.objects.filter(country=country).filter(state=state)
-            else:
-                borders = Borders.objects.filter(level='state').filter(country=country).filter(state=state)
+            borders = Borders.objects.filter(level=level).filter(country=country).filter(state=state)
+            context['borders'] = borders
+        else:
+            borders = Borders.objects.filter(level='country').filter(country=country)
             context['borders'] = borders
 
         return context
@@ -214,20 +206,15 @@ class StateMapLayer(GeoJSONLayerView):
         country = self.kwargs.get('country')
         state = self.kwargs.get('state')
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).last()
         if object:
-            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state)
-
+        queryset = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(date=date)
         if not queryset:
-            queryset = Covid19.objects.filter(date=date).filter(level='state').filter(country_slug=country).filter(state_slug=state)
+            queryset = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date=date)
         return queryset
 
 class CountyMap(TemplateView):
@@ -239,49 +226,48 @@ class CountyMap(TemplateView):
         state = self.kwargs.get('state')
         county = self.kwargs.get('county')
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).last()
         if object:
-            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        data = Covid19.objects.order_by('-confirmed').filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)
+        data = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).filter(date=date)
+
         context = super(CountyMap, self).get_context_data(**kwargs)
-
         if data:
-            context['data'] = data
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).aggregate(Sum('difference'))
-            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='county').filter(state_slug=state).filter(county_slug=county)[:1]
+            context['data'] = data.order_by('-confirmed')
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
             context['country'] = country
             context['state'] = state
             context['county'] = county
             context['date'] = date
             context['county_name'] = data[0].county
         else :
-            level = "county"
-            context['confirmed_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('confirmed'))
-            context['deaths_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('deaths'))
-            context['recovered_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('recovered'))
-            context['difference_number'] = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).aggregate(Sum('difference'))
-            context['centralCountry'] =  Covid19.objects.all().filter(country_slug=country).filter(level='county').filter(state_slug=state).filter(county_slug=county)[:1]
+            data = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(date=date)
+            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
+            context['deaths_number'] = data.aggregate(Sum('deaths'))
+            context['recovered_number'] = data.aggregate(Sum('recovered'))
+            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
             context['country'] = country
             context['state'] = state
             context['date'] = date
             context['county_name'] = county
 
+
         if country == 'Germany' or country == 'germany':
-            if data:
-                borders = Borders.objects.filter(country=country).filter(state=state).filter(county=county)
-            else:
-                borders = Borders.objects.filter(level='county').filter(country=country).filter(state=state)
+            borders = Borders.objects.filter(level=level).filter(country=country).filter(state=state).filter(county=county)
             context['borders'] = borders
+        else:
+            borders = Borders.objects.filter(level='country').filter(country=country)
+            context['borders'] = borders
+
+
 
         return context
 
@@ -301,15 +287,11 @@ class CountyMapLayer(GeoJSONLayerView):
         state = self.kwargs.get('state')
         county = self.kwargs.get('county')
 
-        try:
-            object = Covid19.objects.last()
-        except Covid19.DoesNotExist:
-            object = None
+        object = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).last()
         if object:
-            last_date = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date')
-            date = last_date.date
+            date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date').date
         else:
-            date = today
+            date = yesterday
 
-        queryset = Covid19.objects.filter(date=date).filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)
+        queryset = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).filter(date=date)
         return queryset
