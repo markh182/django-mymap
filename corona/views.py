@@ -19,7 +19,7 @@ class WorldMap(TemplateView):
         if object:
             date = Covid19.objects.filter(level=level).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         data = Covid19.objects.filter(level=level).filter(date=date)
 
@@ -70,7 +70,7 @@ class WorldMapLayer(GeoJSONLayerView):
         if object:
             date = Covid19.objects.filter(level=level).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         queryset = Covid19.objects.filter(level=level).filter(date=date)
         return queryset
@@ -87,7 +87,7 @@ class CountryMap(TemplateView):
         if object:
             date = Covid19.objects.filter(level=level).filter(country_slug=country).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         data = Covid19.objects.filter(level=level).filter(country_slug=country).filter(date=date)
 
@@ -104,10 +104,10 @@ class CountryMap(TemplateView):
             context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  Covid19.objects.filter(level='country').filter(country_slug=country).filter(state='').filter(county='')[:1]
             context['country'] = country
-            context['date'] = data.latest('date')
+            context['date'] = date
             context['country_name'] = data[0].country_name
         else :
-            data = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date=date)
+            data = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date__contains=date)
             context['data'] = ''
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
@@ -119,7 +119,7 @@ class CountryMap(TemplateView):
             context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  data.filter(state='').filter(county='')[:1]
             context['country'] = country
-            context['date'] = data.latest('date')
+            context['date'] = date
             context['country_name'] = country
 
         if country == 'Germany' or country == 'germany':
@@ -150,11 +150,11 @@ class CountryMapLayer(GeoJSONLayerView):
         if object:
             date = Covid19.objects.filter(level=level).filter(country_slug=country).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         queryset = Covid19.objects.filter(level=level).filter(country_slug=country).filter(date=date)
         if not queryset:
-            queryset = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date=date)
+            queryset = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date__contains=date)
         return queryset
 
 
@@ -170,7 +170,7 @@ class StateMap(TemplateView):
         if object:
             date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         data = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(date=date)
 
@@ -188,10 +188,10 @@ class StateMap(TemplateView):
             context['centralCountry'] =  Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(county='')[:1]
             context['country'] = country
             context['state'] = state
-            context['date'] = data.latest('date')
+            context['date'] = date
             context['state_name'] = data[0].state
         else :
-            data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date=date)
+            data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date__contains=date)
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
             context['recovered_sum'] = data.aggregate(Sum('recovered'))
@@ -203,7 +203,7 @@ class StateMap(TemplateView):
             context['centralCountry'] =  data.filter(county='')[:1]
             context['country'] = country
             context['state'] = state
-            context['date'] = data.latest('date')
+            context['date'] = date
             context['state_name'] = state
 
         if country == 'Germany' or country == 'germany':
@@ -234,11 +234,11 @@ class StateMapLayer(GeoJSONLayerView):
         if object:
             date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         queryset = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(date=date)
         if not queryset:
-            queryset = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date=date)
+            queryset = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date__contains=date)
         return queryset
 
 class CountyMap(TemplateView):
@@ -254,7 +254,7 @@ class CountyMap(TemplateView):
         if object:
             date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         data = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).filter(date=date)
 
@@ -273,7 +273,7 @@ class CountyMap(TemplateView):
             context['country'] = country
             context['state'] = state
             context['county'] = county
-            context['date'] = data.latest('date')
+            context['date'] = date
             context['county_name'] = data[0].county
         else :
             data = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(date=date)
@@ -288,7 +288,7 @@ class CountyMap(TemplateView):
             context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
             context['country'] = country
             context['state'] = state
-            context['date'] = data.latest('date')
+            context['date'] = date
             context['county_name'] = county
 
         if country == 'Germany' or country == 'germany':
@@ -320,7 +320,7 @@ class CountyMapLayer(GeoJSONLayerView):
         if object:
             date = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).latest('date').date
         else:
-            date = yesterday
+            date = today
 
         queryset = Covid19.objects.filter(level=level).filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).filter(date=date)
         return queryset
