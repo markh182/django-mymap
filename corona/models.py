@@ -32,10 +32,13 @@ class Covid19(models.Model):
     long = models.CharField(max_length=30, default=0)
     lat = models.CharField(max_length=30, default=0)
     confirmed = models.PositiveIntegerField(default=0)
+    confirmed_difference = models.IntegerField(default=0)
     deaths = models.PositiveIntegerField(default=0)
+    deaths_difference = models.IntegerField(default=0)
     recovered = models.PositiveIntegerField(default=0)
+    recovered_difference = models.IntegerField(default=0)
     tested = models.PositiveIntegerField(default=0)
-    difference = models.PositiveIntegerField(default=0)
+    tested_difference = models.IntegerField(default=0)
     jsonkey = models.CharField(max_length=255, null=True)
 
     def __str__(self):

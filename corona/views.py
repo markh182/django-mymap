@@ -26,17 +26,25 @@ class WorldMap(TemplateView):
         context = super(WorldMap, self).get_context_data(**kwargs)
         if data:
             context['data'] = data.order_by('-confirmed')
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['date'] = data.latest('date')
         else :
             context['data'] = ''
-            context['confirmed_number'] = 0
-            context['deaths_number'] = 0
-            context['recovered_number'] = 0
-            context['difference_number'] = 0
+            context['confirmed_sum'] = 0
+            context['deaths_sum'] = 0
+            context['recovered_sum'] = 0
+            context['tested_sum'] = 0
+            context['confirmed_difference_sum'] = 0
+            context['deaths_difference_sum'] = 0
+            context['recovered_difference_sum'] = 0
+            context['tested_difference_sum'] = 0
             context['date'] = date
 
         borders = Borders.objects.filter(level=level).filter(state='').filter(county='')
@@ -46,7 +54,7 @@ class WorldMap(TemplateView):
 
 
 class WorldMapLayer(GeoJSONLayerView):
-    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'difference') # properties : list of properties names, or dict for mapping field names and properties
+    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'tested', 'confirmed_difference', 'deaths_difference', 'recovered_difference', 'tested_difference') # properties : list of properties names, or dict for mapping field names and properties
     simplify = 0.5 # simplify : generalization of geometries (See simplify())
     precision = 4 # precision : number of digit after comma
     geometry_field = 'geom' # geometry_field : name of geometry field (default: geom)
@@ -86,24 +94,32 @@ class CountryMap(TemplateView):
         context = super(CountryMap, self).get_context_data(**kwargs)
         if data:
             context['data'] = data.order_by('-confirmed')
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  Covid19.objects.filter(level='country').filter(country_slug=country).filter(state='').filter(county='')[:1]
             context['country'] = country
-            context['date'] = date
+            context['date'] = data.latest('date')
             context['country_name'] = data[0].country_name
         else :
             data = Covid19.objects.filter(level='country').filter(country_slug=country).filter(date=date)
             context['data'] = ''
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  data.filter(state='').filter(county='')[:1]
             context['country'] = country
-            context['date'] = date
+            context['date'] = data.latest('date')
             context['country_name'] = country
 
         if country == 'Germany' or country == 'germany':
@@ -117,7 +133,7 @@ class CountryMap(TemplateView):
 
 
 class CountryMapLayer(GeoJSONLayerView):
-    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'difference') # properties : list of properties names, or dict for mapping field names and properties
+    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'tested', 'confirmed_difference', 'deaths_difference', 'recovered_difference', 'tested_difference') # properties : list of properties names, or dict for mapping field names and properties
     simplify = 0.5 # simplify : generalization of geometries (See simplify())
     precision = 4 # precision : number of digit after comma
     geometry_field = 'geom' # geometry_field : name of geometry field (default: geom)
@@ -161,25 +177,33 @@ class StateMap(TemplateView):
         context = super(StateMap, self).get_context_data(**kwargs)
         if data:
             context['data'] = data.order_by('-confirmed')
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(county='')[:1]
             context['country'] = country
             context['state'] = state
-            context['date'] = date
+            context['date'] = data.latest('date')
             context['state_name'] = data[0].state
         else :
             data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date=date)
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  data.filter(county='')[:1]
             context['country'] = country
             context['state'] = state
-            context['date'] = date
+            context['date'] = data.latest('date')
             context['state_name'] = state
 
         if country == 'Germany' or country == 'germany':
@@ -192,7 +216,7 @@ class StateMap(TemplateView):
         return context
 
 class StateMapLayer(GeoJSONLayerView):
-    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'difference') # properties : list of properties names, or dict for mapping field names and properties
+    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'tested', 'confirmed_difference', 'deaths_difference', 'recovered_difference', 'tested_difference') # properties : list of properties names, or dict for mapping field names and properties
     simplify = 0.5 # simplify : generalization of geometries (See simplify())
     precision = 4 # precision : number of digit after comma
     geometry_field = 'geom' # geometry_field : name of geometry field (default: geom)
@@ -237,28 +261,35 @@ class CountyMap(TemplateView):
         context = super(CountyMap, self).get_context_data(**kwargs)
         if data:
             context['data'] = data.order_by('-confirmed')
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
             context['country'] = country
             context['state'] = state
             context['county'] = county
-            context['date'] = date
+            context['date'] = data.latest('date')
             context['county_name'] = data[0].county
         else :
             data = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(date=date)
-            context['confirmed_number'] = data.aggregate(Sum('confirmed'))
-            context['deaths_number'] = data.aggregate(Sum('deaths'))
-            context['recovered_number'] = data.aggregate(Sum('recovered'))
-            context['difference_number'] = data.aggregate(Sum('difference'))
+            context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
+            context['deaths_sum'] = data.aggregate(Sum('deaths'))
+            context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            context['tested_sum'] = data.aggregate(Sum('tested'))
+            context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
+            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
             context['country'] = country
             context['state'] = state
-            context['date'] = date
+            context['date'] = data.latest('date')
             context['county_name'] = county
-
 
         if country == 'Germany' or country == 'germany':
             borders = Borders.objects.filter(level=level).filter(country=country).filter(state=state).filter(county=county)
@@ -267,12 +298,10 @@ class CountyMap(TemplateView):
             borders = Borders.objects.filter(level='country').filter(country=country)
             context['borders'] = borders
 
-
-
         return context
 
 class CountyMapLayer(GeoJSONLayerView):
-    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'difference') # properties : list of properties names, or dict for mapping field names and properties
+    properties=('country_name', 'state', 'county', 'confirmed', 'deaths', 'recovered', 'tested', 'confirmed_difference', 'deaths_difference', 'recovered_difference', 'tested_difference') # properties : list of properties names, or dict for mapping field names and properties
     simplify = 0.5 # simplify : generalization of geometries (See simplify())
     precision = 4 # precision : number of digit after comma
     geometry_field = 'geom' # geometry_field : name of geometry field (default: geom)

@@ -61,7 +61,7 @@
                 var props = feature.properties;
                 icon = L.divIcon({
                   className: 'custom-div-icon',
-                  html : `<div class="circle circle1" data-tooltip="${props.county}\nConfirmed: ${props.confirmed}\Increase to previous day: ${props.difference}\nDeaths: ${props.deaths}"><div class="circle circle2"><div class="circle circle3"></div></div></div>`,
+                  html : `<div class="circle circle1" data-tooltip="${props.county}\nConfirmed: ${props.confirmed}\Increase to previous day: ${props.confirmed_difference}\nDeaths: ${props.deaths}"><div class="circle circle2"><div class="circle circle3"></div></div></div>`,
                   iconSize: [30, 42],
                   iconAnchor: [15, 42]
                 });
@@ -78,7 +78,7 @@
                     <div class="cases-number">${formatNumber(props.confirmed)}</div>
                   </div>
                   <div class="display-box display-difference">
-                    <div class="cases-number">${formatNumber(props.difference)}</div>
+                    <div class="cases-number">${formatNumber(props.confirmed_difference)}</div>
                   </div>
                   <div class="display-box display-deaths">
                     <div class="cases-number">${formatNumber(props.deaths)}</div>
@@ -106,22 +106,22 @@
       </div>
       <div class="sidebar">
         <div class="sidebar-title">
-          <div class="display-title">Coronavirus cases  {{ state_name|title }}</div>
+          <div class="display-title">Coronavirus cases {{ state_name }}</div>
           <div class="display-timestamp">
             <strong>Last updated:</strong> {{ date.date }}
           </div>
         </div>
         <div class="display-detail">
           <div class="display-box display-confirmed">
-            <div class="cases-number">{{ confirmed_number.confirmed__sum|intcomma }}</div>
+            <div class="cases-number">{{ confirmed_sum.confirmed__sum|intcomma }}</div>
             <div class="cases-label">Confirmed</div>
           </div>
           <div class="display-box display-difference">
-            <div class="cases-number">{{ difference_number.difference__sum|intcomma }}</div>
+            <div class="cases-number">{{ confirmed_difference_sum.confirmed_difference__sum|intcomma }}</div>
             <div class="cases-label">Increase</div>
           </div>
           <div class="display-box display-deaths">
-            <div class="cases-number">{{ deaths_number.deaths__sum|intcomma }}</div>
+            <div class="cases-number">{{ deaths_sum.deaths__sum|intcomma }}</div>
             <div class="cases-label">Deaths</div>
           </div>
         </div>
@@ -140,7 +140,7 @@
             <span class="title">{{ row.county }}</span>
             <div class="right">
               <span class="confirmed">{{ row.confirmed|intcomma }}</span>
-              <span class="difference">{{ row.difference|intcomma }}</span>
+              <span class="difference">{{ row.confirmed_difference|intcomma }}</span>
               <span class="deaths">{{ row.deaths|intcomma }}</span>
             </div>
           </div>
