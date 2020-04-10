@@ -191,7 +191,7 @@ class StateMap(TemplateView):
             context['date'] = date
             context['state_name'] = data[0].state
         else :
-            data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date__contains=date)
+            data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date__icontains=date)
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
             context['recovered_sum'] = data.aggregate(Sum('recovered'))

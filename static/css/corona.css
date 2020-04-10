@@ -181,6 +181,7 @@ div.legal div.sources p {
   padding: 0.3rem;
   font-weight: bold;
   font-size: 0.9rem;
+  text-align: left;
   border-bottom: 1px solid var(--boxlist-title-border-bottom);
 }
 div.box-list-title span.confirmed,
@@ -225,6 +226,70 @@ div.box-list-item span.deaths {
 div.box-list-item span.nodata {
   width: 25vw;
   text-align: left;
+}
+
+
+.fixed_header {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+.fixed_header thead {
+  border-bottom: 1px solid var(--border-color);
+  color:#000;
+}
+.fixed_header thead tr,
+.fixed_header tbody tr {
+  display: block;
+}
+.fixed_header tbody{
+  display: block;
+  width: 100%;
+  overflow: auto;
+}
+.fixed_header th, .fixed_header td {
+  padding: 0.3rem;
+  font-weight: bold;
+}
+table.fixed_header thead tr {
+  cursor: pointer;
+}
+table.fixed_header thead tr th.header-country {
+  text-align: left;
+  font-size: 0.9rem;
+}
+table.fixed_header thead tr th.header-confirmed,
+table.fixed_header thead tr th.header-increase,
+table.fixed_header thead tr th.header-deaths {
+  text-align: left;
+  font-size: 0.6rem;
+}
+table.fixed_header tbody tr {
+  border-bottom: 1px solid var(--border-color);
+}
+table.fixed_header tbody tr td.body-country,
+table.fixed_header tbody tr td.nodata {
+  font-size: 0.75rem;
+  /* width: 10rem; */
+}
+table.fixed_header tbody tr td.body-confirmed,
+table.fixed_header tbody tr td.body-increase,
+table.fixed_header tbody tr td.body-deaths {
+  text-align: right;
+  font-size: 0.75rem;
+  /* width: 3rem; */
+}
+table.fixed_header span.confirmed {
+  color: var(--confirmed-color);
+}
+table.fixed_header span.recovered {
+  color: var(--recovered-color);
+}
+table.fixed_header span.difference {
+  color: var(--difference-color);
+}
+table.fixed_header span.deaths {
+  color: var(--deaths-color);
 }
 
 /* Map Marker */
@@ -318,6 +383,27 @@ div.leaflet-popup-content div.title {
   div.box-list-item span {
     width: 3rem;
   }
+  .fixed_header tbody{
+    height: calc(50vh);
+  }
+  table.fixed_header thead tr th.header-country {
+    width: 30%;
+  }
+  table.fixed_header thead tr th.header-confirmed,
+  table.fixed_header thead tr th.header-increase,
+  table.fixed_header thead tr th.header-deaths {
+    text-align: right;
+    width: 8rem;
+  }
+  table.fixed_header tbody tr td.body-country,
+  table.fixed_header tbody tr td.nodata {
+    width: 30%;
+  }
+  table.fixed_header tbody tr td.body-confirmed,
+  table.fixed_header tbody tr td.body-increase,
+  table.fixed_header tbody tr td.body-deaths {
+    width: 8rem;
+  }
 }
 /* Small devices (portrait tablet and phones) */
 @media only screen and (min-width:600px) {
@@ -347,6 +433,27 @@ div.leaflet-popup-content div.title {
   }
   div.box-list-item span {
     width: 3rem;
+  }
+  .fixed_header tbody{
+    height: calc(50vh);
+  }
+  table.fixed_header thead tr th.header-country {
+    width: 15rem;
+  }
+  table.fixed_header thead tr th.header-confirmed,
+  table.fixed_header thead tr th.header-increase,
+  table.fixed_header thead tr th.header-deaths {
+    text-align: right;
+    width: 8rem;
+  }
+  table.fixed_header tbody tr td.body-country,
+  table.fixed_header tbody tr td.nodata {
+    width: 15rem;
+  }
+  table.fixed_header tbody tr td.body-confirmed,
+  table.fixed_header tbody tr td.body-increase,
+  table.fixed_header tbody tr td.body-deaths {
+    width: 8rem;
   }
 }
 /* Medium devices (landscape tablets) */
@@ -382,6 +489,26 @@ div.leaflet-popup-content div.title {
     width: 30vw;
   }
   div.box-list-item span {
+    width: 3rem;
+  }
+  .fixed_header tbody{
+    height: calc(50vh);
+  }
+  table.fixed_header thead tr th.header-country {
+    width: 10rem;
+  }
+  table.fixed_header thead tr th.header-confirmed,
+  table.fixed_header thead tr th.header-increase,
+  table.fixed_header thead tr th.header-deaths {
+    width: 3rem;
+  }
+  table.fixed_header tbody tr td.body-country,
+  table.fixed_header tbody tr td.nodata {
+    width: 10rem;
+  }
+  table.fixed_header tbody tr td.body-confirmed,
+  table.fixed_header tbody tr td.body-increase,
+  table.fixed_header tbody tr td.body-deaths {
     width: 3rem;
   }
 }
@@ -422,6 +549,26 @@ div.leaflet-popup-content div.title {
   div.box-list-item span {
     width: 3.75rem;
   }
+  .fixed_header tbody{
+    height: calc(100vh - 222px - 36px);
+  }
+  table.fixed_header thead tr th.header-country {
+    width: 10rem;
+  }
+  table.fixed_header thead tr th.header-confirmed,
+  table.fixed_header thead tr th.header-increase,
+  table.fixed_header thead tr th.header-deaths {
+    width: 3rem;
+  }
+  table.fixed_header tbody tr td.body-country,
+  table.fixed_header tbody tr td.nodata {
+    width: 10rem;
+  }
+  table.fixed_header tbody tr td.body-confirmed,
+  table.fixed_header tbody tr td.body-increase,
+  table.fixed_header tbody tr td.body-deaths {
+    width: 3rem;
+  }
 }
 /* Extra small devices (large laptops and deskops ) */
 @media only screen and (min-width:1200px) {
@@ -454,10 +601,31 @@ div.leaflet-popup-content div.title {
      overflow-y: auto;
      overflow-x: hidden;
   }
-  div.box-list-item span.title {
-    width: ;
+  div.box-list-item span.title,
+  table.sortable span.title {
+    width: 35%;
   }
   div.box-list-item span {
     width: 3.75rem;
+  }
+  .fixed_header tbody{
+    height: calc(100vh - 222px - 36px);
+  }
+  table.fixed_header thead tr th.header-country {
+    width: 10rem;
+  }
+  table.fixed_header thead tr th.header-confirmed,
+  table.fixed_header thead tr th.header-increase,
+  table.fixed_header thead tr th.header-deaths {
+    width: 3rem;
+  }
+  table.fixed_header tbody tr td.body-country,
+  table.fixed_header tbody tr td.nodata {
+    width: 10rem;
+  }
+  table.fixed_header tbody tr td.body-confirmed,
+  table.fixed_header tbody tr td.body-increase,
+  table.fixed_header tbody tr td.body-deaths {
+    width: 3rem;
   }
 }

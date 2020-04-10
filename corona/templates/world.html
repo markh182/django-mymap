@@ -5,18 +5,20 @@
 <html id="world">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>{% block title %} COVID-19 {% endblock %}</title>
     {{ form.media }}
     {% leaflet_js %}
     {% leaflet_css %}
     <link rel="stylesheet" href="{% static "css/corona.css" %}">
+    <script src="{% static "js/sorttable.js" %}"></script>
     <script type="text/javascript">
       var dataurl = '{% url "corona:world_data" %}';
       window.addEventListener("map:init", function (event) {
         var map = event.detail.map;
         map.removeControl(map.zoomControl);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
+        map.locate({setView: true, maxZoom: 5});
 
         function polystyle(feature) {
           return {
@@ -116,7 +118,35 @@
             <div class="cases-label">Deaths</div>
           </div>
         </div>
-        <div class="box-list-title">
+
+        <table class="fixed_header sortable">
+          <thead>
+            <tr>
+              <th class="header-country">Country</th>
+              <th class="header-confirmed">Confirmed</th>
+              <th class="header-increase">Increase</th>
+              <th class="header-deaths">Deaths</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if data %}
+            {% for row in data %}
+              <tr>
+                <td class="body-country"><a href="{% url 'corona:country' row.country_slug %}"><span class="title">{{ row.country_name }}</span></a></td>
+                <td class="body-confirmed"><span class="confirmed"><span style="display:none;">{{ row.confirmed }}</span>{{ row.confirmed|intcomma }}</span></td>
+                <td class="body-increase"><span class="difference"><span style="display:none;">{{ row.confirmed_difference }}</span>{{ row.confirmed_difference|intcomma }}</span></td>
+                <td class="body-deaths"><span class="deaths"><span style="display:none;">{{ row.deaths }}</span>{{ row.deaths|intcomma }}</span></td>
+              </tr>
+            {% endfor %}
+            {% else %}
+            <tr colspan="4">
+              <td class="nodata"><span>No data available.</span></td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+
+        <!-- <div class="box-list-title">
           <span class="country">Countries</span>
         </div>
         {% if data %}
@@ -138,7 +168,7 @@
         <div class="box-list-item">
           <span class="nodata">No data available.</span>
         </div>
-        {% endif %}
+        {% endif %} -->
       </div>
       <div class="legal">
         <div class="sources">

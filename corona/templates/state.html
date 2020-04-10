@@ -125,33 +125,34 @@
             <div class="cases-label">Deaths</div>
           </div>
         </div>
-        <div class="box-list-title">
-          <span class="country">Counties</span>
-        </div>
-        {% if data %}
-        <div class="box-list-height">
-        {% for row in data %}
-          {% if row.county_slug %}
-          <a href="{% url 'corona:county' row.country_slug row.state_slug row.county_slug %}">
-          {% else %}
-          <a href="#">
-          {% endif %}
-          <div class="box-list-item">
-            <span class="title">{{ row.county }}</span>
-            <div class="right">
-              <span class="confirmed">{{ row.confirmed|intcomma }}</span>
-              <span class="difference">{{ row.confirmed_difference|intcomma }}</span>
-              <span class="deaths">{{ row.deaths|intcomma }}</span>
-            </div>
-          </div>
-        </a>
-        {% endfor %}
-        </div>
-        {% else %}
-        <div class="box-list-item">
-          <span class="nodata">No data available.</span>
-        </div>
-        {% endif %}
+
+        <table class="fixed_header sortable">
+          <thead>
+            <tr>
+              <th class="header-country">Counties</th>
+              <th class="header-confirmed">Confirmed</th>
+              <th class="header-increase">Increase</th>
+              <th class="header-deaths">Deaths</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if data %}
+            {% for row in data %}
+              <tr>
+                <td class="body-country"><a href="{% url 'corona:county' row.country_slug row.state_slug row.county_slug %}"><span class="title">{{ row.county }}</span></a></td>
+                <td class="body-confirmed"><span class="confirmed"><span style="display:none;">{{ row.confirmed }}</span>{{ row.confirmed|intcomma }}</span></td>
+                <td class="body-increase"><span class="difference"><span style="display:none;">{{ row.confirmed_difference }}</span>{{ row.confirmed_difference|intcomma }}</span></td>
+                <td class="body-deaths"><span class="deaths"><span style="display:none;">{{ row.deaths }}</span>{{ row.deaths|intcomma }}</span></td>
+              </tr>
+            {% endfor %}
+            {% else %}
+            <tr colspan="4">
+              <td class="nodata"><span>No data available.</span></td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+
       </div>
       <div class="legal">
         <div class="sources">
