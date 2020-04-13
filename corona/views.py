@@ -28,23 +28,23 @@ class WorldMap(TemplateView):
             context['data'] = data.order_by('-confirmed')
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
             context['date'] = data.latest('date')
         else :
             context['data'] = ''
             context['confirmed_sum'] = 0
             context['deaths_sum'] = 0
-            context['recovered_sum'] = 0
-            context['tested_sum'] = 0
+            # context['recovered_sum'] = 0
+            # context['tested_sum'] = 0
             context['confirmed_difference_sum'] = 0
-            context['deaths_difference_sum'] = 0
-            context['recovered_difference_sum'] = 0
-            context['tested_difference_sum'] = 0
+            # context['deaths_difference_sum'] = 0
+            # context['recovered_difference_sum'] = 0
+            # context['tested_difference_sum'] = 0
             context['date'] = date
 
         borders = Borders.objects.filter(level=level).filter(state='').filter(county='')
@@ -96,13 +96,13 @@ class CountryMap(TemplateView):
             context['data'] = data.order_by('-confirmed')
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
-            context['centralCountry'] =  Covid19.objects.filter(level='country').filter(country_slug=country).filter(state='').filter(county='')[:1]
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='country').filter(country_slug=country).filter(state='').filter(county='').order_by('-date')[:1]
             context['country'] = country
             context['date'] = date
             context['country_name'] = data[0].country_name
@@ -111,13 +111,13 @@ class CountryMap(TemplateView):
             context['data'] = ''
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
-            context['centralCountry'] =  data.filter(state='').filter(county='')[:1]
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            context['centralCountry'] =  data.filter(state='').filter(county='').order_by('-date')[:1]
             context['country'] = country
             context['date'] = date
             context['country_name'] = country
@@ -179,13 +179,13 @@ class StateMap(TemplateView):
             context['data'] = data.order_by('-confirmed')
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
-            context['centralCountry'] =  Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(county='')[:1]
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(county='').order_by('-date')[:1]
             context['country'] = country
             context['state'] = state
             context['date'] = date
@@ -194,13 +194,13 @@ class StateMap(TemplateView):
             data = Covid19.objects.filter(level='state').filter(country_slug=country).filter(state_slug=state).filter(date__icontains=date)
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
-            context['centralCountry'] =  data.filter(county='')[:1]
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            context['centralCountry'] =  data.filter(county='').order_by('-date')[:1]
             context['country'] = country
             context['state'] = state
             context['date'] = date
@@ -263,13 +263,13 @@ class CountyMap(TemplateView):
             context['data'] = data.order_by('-confirmed')
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
-            context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county).order_by('-date')[:1]
             context['country'] = country
             context['state'] = state
             context['county'] = county
@@ -279,13 +279,13 @@ class CountyMap(TemplateView):
             data = Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(date=date)
             context['confirmed_sum'] = data.aggregate(Sum('confirmed'))
             context['deaths_sum'] = data.aggregate(Sum('deaths'))
-            context['recovered_sum'] = data.aggregate(Sum('recovered'))
-            context['tested_sum'] = data.aggregate(Sum('tested'))
+            # context['recovered_sum'] = data.aggregate(Sum('recovered'))
+            # context['tested_sum'] = data.aggregate(Sum('tested'))
             context['confirmed_difference_sum'] = data.aggregate(Sum('confirmed_difference'))
-            context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
-            context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
-            context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
-            context['centralCountry'] =  Covid19.objects.filter(level='county').filter(country_slug=country).filter(state_slug=state).filter(county_slug=county)[:1]
+            # context['deaths_difference_sum'] = data.aggregate(Sum('deaths_difference'))
+            # context['recovered_difference_sum'] = data.aggregate(Sum('recovered_difference'))
+            # context['tested_difference_sum'] = data.aggregate(Sum('tested_difference'))
+            context['centralCountry'] =  data.filter(county_slug=county).order_by('-date')[:1]
             context['country'] = country
             context['state'] = state
             context['date'] = date

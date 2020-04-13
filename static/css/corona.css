@@ -292,6 +292,7 @@ table.fixed_header span.deaths {
   color: var(--deaths-color);
 }
 
+
 /* Map Marker */
 div.circle {
   border-radius: 50%;
